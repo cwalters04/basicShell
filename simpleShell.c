@@ -99,6 +99,14 @@ int executeCommand(char **args){
         // An empty command was entered
         return 1;
     }
+    // Handle exit command
+    if(strcmp(args[0], "exit") == 0){
+    return 0; // Exit command
+    }
+    // Handle cd command
+    if(strcmp(args[0], "cd") == 0){
+    return cdCommand(args); // Handle the cd command
+    }
 
     pid = fork();
     if(pid == 0){
