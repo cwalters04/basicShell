@@ -118,7 +118,7 @@ int executeCommand(char **args){
     }
     // Handle cd command
     if(strcmp(args[0], "cd") == 0){
-    return cdCommand(**args); // Handle the cd command
+    return cdCommand(args); // Handle the cd command
     }
 
     pid = fork();
