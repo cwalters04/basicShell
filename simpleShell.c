@@ -90,6 +90,19 @@ char **parseLine(char *line) {
     tokens[position] = NULL;
     return tokens;
 }
+
+// Command should allow user to get the current directory
+int cdCommand(char **args){
+    if(args[1] == NULL){
+        fprintf(stderr, "myshell: expected argument to \"cd\"\n");
+    } else{
+        if(chdir(args[1]) != 0){
+        perror("myshell");
+        }
+    }
+    return 1;
+}
+
 // Execute commands for the user input
 int executeCommand(char **args){
     pid_t pid, wpid;
@@ -128,16 +141,5 @@ int executeCommand(char **args){
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
     }
 
-    return 1;
-}
-// Command should allow user to get the current directory
-int cdCommand(char **args){
-    if(args[1] == NULL){
-        fprintf(stderr, "myshell: expected argument to \"cd\"\n");
-    } else{
-        if(chdir(args[1]) != 0){
-        perror("myshell");
-        }
-    }
     return 1;
 }
