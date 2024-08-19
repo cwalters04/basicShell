@@ -18,6 +18,26 @@ int main() {
     return 0;
 }
 
+// Command should allow user to get the current directory
+char* cdCommand(char **args){
+    if(args[1] == NULL){
+        fprintf(stderr, "myshell: expected argument to \"cd\"\n");
+    } else{
+        if(chdir(args[1]) != 0){
+        perror("myshell");
+        }
+    }
+    char *cwd = malloc(MAX_INPUT_SIZE * sizeof(char));
+    if(getcwd(cwd, MAX_INPUT_SIZE) != NULL){
+        return cwd; // Return the current directory
+    } else
+    {
+        perror("myshell");
+        return NULL;
+    }   
+}
+
+// Run the shell until 'exit'
 void shellLoop(){
     char *line;
     char **args;
@@ -98,24 +118,7 @@ char **parseLine(char *line) {
     return tokens;
 }
 
-// Command should allow user to get the current directory
-char* cdCommand(char **args){
-    if(args[1] == NULL){
-        fprintf(stderr, "myshell: expected argument to \"cd\"\n");
-    } else{
-        if(chdir(args[1]) != 0){
-        perror("myshell");
-        }
-    }
-    char *cwd = malloc(MAX_INPUT_SIZE * sizeof(char));
-    if(getcwd(cwd, MAX_INPUT_SIZE) != NULL){
-        return cwd; // Return the current directory
-    } else
-    {
-        perror("myshell");
-        return NULL;
-    }   
-}
+
 
 // Execute commands for the user input
 int executeCommand(char **args){
@@ -131,7 +134,7 @@ int executeCommand(char **args){
     return 0; // Exit command
     }
     // Handle cd command
-    if(strcmp(args[0], "cd") == 0){
+    if(strcmp(args[0], "cd") != NULL){
     return cdCommand(args); // Handle the cd command
     }
 
