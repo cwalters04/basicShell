@@ -19,22 +19,30 @@ int main() {
 }
 
 // Command should allow user to get the current directory
-char* cdCommand(char **args){
-    if(args[1] == NULL){
+char* cdCommand(char **args) {
+    if (args[1] == NULL) {
         fprintf(stderr, "myshell: expected argument to \"cd\"\n");
-    } else{
-        if(chdir(args[1]) != 0){
-        perror("myshell");
-        }
+        return NULL;
     }
-    char *cwd = malloc(MAX_INPUT_SIZE * sizeof(char));
-    if(getcwd(cwd, MAX_INPUT_SIZE) != NULL){
-        return cwd; // Return the current directory
-    } else
-    {
+    
+    if (chdir(args[1]) != 0) {
         perror("myshell");
         return NULL;
-    }   
+    }
+
+    char *cwd = malloc(MAX_INPUT_SIZE * sizeof(char));
+    if (cwd == NULL) {
+        perror("myshell");
+        return NULL;
+    }
+
+    if (getcwd(cwd, MAX_INPUT_SIZE) == NULL) {
+        perror("myshell");
+        free(cwd); // Free allocated memory on failure
+        return NULL;
+    }
+
+    return cwd;
 }
 
 // Run the shell until 'exit'
@@ -42,14 +50,15 @@ void shellLoop(){
     char *line;
     char **args;
     int status;
-    char *currentDir = cdCommand(args);
+    char *currentDir;
     do{
+        // Get current directory before printing the prompt
+        currentDir = getcwd(NULL, 0);
         if(currentDir != NULL){
-        // Print shell prompt with current directory
-        printf("myshell> %s", currentDir);
-        free(currentDir);
-        } else
-        {
+            // Print shell prompt with current directory
+            printf("myshell> %s> ", currentDir);
+            free(currentDir); // Free memory allocated to by getcwd
+        } else {
             printf("myshell> ");
         }
         
@@ -67,6 +76,7 @@ void shellLoop(){
         free(args);
     } while(status);
 }
+
 // Read the line given by the user
 char *readLine(){
     char *line = NULL;
@@ -133,10 +143,17 @@ int executeCommand(char **args){
     if(strcmp(args[0], "exit") == 0){
     return 0; // Exit command
     }
+
     // Handle cd command
-    if(strcmp(args[0], "cd") != NULL){
-    return cdCommand(args); // Handle the cd command
+    if(strcmp(args[0], "cd") == 0){
+        // Execute cd command, but don't return its result
+        char *newDir = cdCommand(args);
+        if(newDir != NULL){
+            free(newDir); // Free memory allocated to the directory
+        }
+        return 1; // continue running the shell
     }
+
 
     pid = fork();
     if(pid == 0){
@@ -158,5 +175,5 @@ int executeCommand(char **args){
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
     }
 
-    return 1;
+    return 1; // Continue running shell
 }
