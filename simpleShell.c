@@ -24,7 +24,7 @@ void shellLoop(){
     int status;
     do{
         // Print shell prompt
-        printf("myshell> ");
+        printf("myshell> %c", cdCommand);
 
         // Read input from the user
         line = readLine();
@@ -92,7 +92,7 @@ char **parseLine(char *line) {
 }
 
 // Command should allow user to get the current directory
-int cdCommand(char **args){
+char cdCommand(char **args){
     if(args[1] == NULL){
         fprintf(stderr, "myshell: expected argument to \"cd\"\n");
     } else{
@@ -100,7 +100,7 @@ int cdCommand(char **args){
         perror("myshell");
         }
     }
-    return 1;
+    return args;
 }
 
 // Execute commands for the user input
